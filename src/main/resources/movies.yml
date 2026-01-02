@@ -17,6 +17,27 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Movie'
+    post:
+      summary: Add a new movie
+      description: Adds a new movie to the database.
+      operationId: addMovie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+      responses:
+        '201':
+          description: Movie created successfully
+          content:
+            # Since we don't map _id or any other sensitive fields Movie is OK to return as is
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid movie data
+
   /movies/{partialName}:
     get:
       summary: Fuzzily search movies by partial name
@@ -63,8 +84,10 @@ components:
           $ref: '#/components/schemas/Personnel'
         synopsis:
           type: string
+      # TODO Figure out how to uniquely identify movies. Name alone is certainly not enough
       required:
-        - title
+        - name
+        - year
     # Schema for a person who worked on the film
     Personnel:
       type: object
@@ -73,4 +96,7 @@ components:
           type: string
         lastName:
           type: string
+      required:
+        - firstName
+        - lastName
 

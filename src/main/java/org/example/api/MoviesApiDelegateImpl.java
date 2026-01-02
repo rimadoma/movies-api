@@ -29,4 +29,10 @@ public class MoviesApiDelegateImpl implements MoviesApiDelegate {
 
         return ResponseEntity.ok(movies);
     }
+
+    public ResponseEntity<Movie> addMovie(Movie movie) {
+        final Movie addedMovie = movieDao.replaceMovie(movie);
+        // TODO Return error if null returned
+        return ResponseEntity.ok(movie);
+    }
 }
