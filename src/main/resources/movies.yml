@@ -1,0 +1,76 @@
+openapi: "3.0.0"
+info:
+  title: Movie API
+  version: 1.0.0
+
+paths:
+  /movies:
+    get:
+      summary: List all movies
+      operationId: listMovies
+      responses:
+        '200':
+          description: A list of movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+  /movies/{partialName}:
+    get:
+      summary: Fuzzily search movies by partial name
+      description: Return movies whose name fuzzily autocomplete into the given part
+      operationId: partialNameSearch
+      parameters:
+        - name: partialName
+          in: path
+          required: true
+          description: Partial movie name to search for
+          schema:
+            type: string
+            maxLength: 50
+      responses:
+        '200':
+          description: Matching movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        '400':
+          description: Invalid search term
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        name:
+          type: string
+        year:
+          type: integer
+        ageLimit:
+          type: integer
+        rating:
+          type: integer
+        actors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Personnel'
+        director:
+          $ref: '#/components/schemas/Personnel'
+        synopsis:
+          type: string
+      required:
+        - title
+    # Schema for a person who worked on the film
+    Personnel:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+
