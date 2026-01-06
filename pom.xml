@@ -12,16 +12,19 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>3.5.7</spring.boot.version> <!-- Try 4.x.x? -->
+        <spring.boot.version>3.5.7</spring.boot.version>
+        <mockito.version>5.21.0</mockito.version>
     </properties>
 
     <dependencies>
+        <!-- MongoDB -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>5.6.2</version>
         </dependency>
 
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -33,6 +36,7 @@
             <version>${spring.boot.version}</version>
         </dependency>
 
+        <!-- OpenAPI -->
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
@@ -50,21 +54,32 @@
             <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Annotations in generated api code -->
         <dependency>
+            <!-- Validation annotations in generated api code -->
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>3.0.2</version>
         </dependency>
 
+        <!-- Testing dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>6.0.1</version>
             <scope>test</scope>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

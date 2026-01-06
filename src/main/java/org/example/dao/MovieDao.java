@@ -1,4 +1,4 @@
-package org.example;
+package org.example.dao;
 
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
@@ -15,29 +15,22 @@ import com.mongodb.client.model.search.SearchPath;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.example.model.Movie;
-import org.example.model.Personnel;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.example.dao.MovieMappers.NAME;
+import static org.example.dao.MovieMappers.YEAR;
+import static org.example.dao.MovieMappers.toDocument;
+
 /**
- * Handles MongoDB operations and transforms the documents into domain models.
+ * Persists and queries movie data (in MongoDB).
  */
-// TODO Consider refactoring mappers into a separate class
 @Service public class MovieDao {
-    private static final String NAME = "name";
     private static final FuzzySearchOptions fuzzyOptions =
             FuzzySearchOptions.fuzzySearchOptions().maxEdits(1);
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
-    public static final String YEAR = "year";
-    public static final String DIRECTOR = "director";
-    public static final String FIRST_NAME = "firstName";
-    public static final String LAST_NAME = "lastName";
-    public static final String AGE_LIMIT = "ageLimit";
-    public static final String RATING = "rating";
-    public static final String SYNOPSIS = "synopsis";
-    public static final String ACTORS = "actors";
     private final MongoClient client;
     private final MongoCollection<Document> collection;
 
@@ -81,70 +74,8 @@ import java.util.List;
     }
 
     private static List<Movie> toMovies(MongoIterable<Document> iterable) {
-        List<Document> movies = new ArrayList<>();
         // Closes the cursor implicitly
-        iterable.into(movies);
-        return movies.stream().map(MovieDao::fromDocument).toList();
-    }
-
-    private static Movie fromDocument(Document document) {
-        final Movie movie = new Movie();
-
-        movie.setName(document.getString(NAME));
-        movie.setYear(document.getInteger(YEAR));
-        movie.setAgeLimit(document.getInteger(AGE_LIMIT));
-        movie.setRating(document.getInteger(RATING));
-        movie.setSynopsis(document.getString(SYNOPSIS));
-
-        if (document.get(DIRECTOR, Document.class) != null) {
-            final Personnel director = fromSubDocument(document.get(DIRECTOR, Document.class));
-            movie.setDirector(director);
-        }
-
-        List<Document> actorDocs = document.getList(ACTORS, Document.class);
-        if (actorDocs != null) {
-            List<Personnel> actors = actorDocs.stream().map(MovieDao::fromSubDocument).toList();
-            movie.setActors(actors);
-        }
-
-        return movie;
-    }
-
-    private static Personnel fromSubDocument(Document doc) {
-        if (doc == null) {
-            return null;
-        }
-
-        Personnel p = new Personnel();
-        p.setFirstName(doc.getString(FIRST_NAME));
-        p.setLastName(doc.getString(LAST_NAME));
-        return p;
-    }
-
-
-    public static Document toDocument(Movie movie) {
-        Document doc = new Document();
-
-        doc.append(NAME, movie.getName());
-        doc.append(YEAR, movie.getYear());
-        doc.append(AGE_LIMIT, movie.getAgeLimit());
-        doc.append(RATING, movie.getRating());
-        doc.append(SYNOPSIS, movie.getSynopsis());
-
-        if (movie.getDirector() != null) {
-            Document directorDoc =
-                    new Document().append(FIRST_NAME, movie.getDirector().getFirstName())
-                            .append(LAST_NAME, movie.getDirector().getLastName());
-            doc.append(DIRECTOR, directorDoc);
-        }
-
-        if (movie.getActors() != null) {
-            List<Document> actorDocs = movie.getActors().stream()
-                    .map(a -> new Document().append(FIRST_NAME, a.getFirstName())
-                            .append(LAST_NAME, a.getLastName())).toList();
-            doc.append(ACTORS, actorDocs);
-        }
-
-        return doc;
+        List<Document> movies = iterable.into(new ArrayList<>());
+        return movies.stream().map(MovieMappers::fromDocument).toList();
     }
 }
