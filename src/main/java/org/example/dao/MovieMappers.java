@@ -41,6 +41,7 @@ public class MovieMappers {
 
         List<Document> actorDocs = document.getList(ACTORS, Document.class);
         if (actorDocs != null) {
+            // NB doesn't check for duplicates
             List<Personnel> actors =
                     actorDocs.stream().filter(Objects::nonNull).map(MovieMappers::fromSubDocument)
                             .toList();
